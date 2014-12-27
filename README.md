@@ -9,6 +9,7 @@ OSXにはない３ヶ月表示オプションを追加したついでに、通�
  先月/今月/来月の３ヶ月カレンダーを表示します。
 - +3オプション
  今月/来月/再来月の３ヶ月カレンダーを表示します。
+
 ##License
 This script has released under the MIT license.  
 [http://opensource.org/licenses/MIT](http://opensource.org/licenses/MIT)
