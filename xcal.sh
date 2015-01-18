@@ -1,5 +1,5 @@
 #! /bin/sh
-# @(#) xcal.sh ver.1.2  2014.12.27  (c)Takeru.
+# @(#) xcal.sh ver.1.3  2015.1.18  (c)Takeru.
 #
 # Usage:
 #      xcal.sh [-m month [year]]
@@ -21,6 +21,12 @@
 #
 #######################################################################
 set -o nounset                              # Treat unset variables as an error
+OLD_IFS=$IFS
+declare -a conf_ext=("WEEK" "JAN" "FEB" "MAR" "APR" "MAY" "JUN" "JUL" "AUG" "SEP" "OCT" "NOV" "DEC")
+declare -a conf_dat=()
+for i in `seq 0 12`; do
+	conf_dat[$i]="XCAL"${conf_ext[$i]}
+done
 declare -a get_date=(`date '+%Y %m'`)
 curr_y=${get_date[0]}
 curr_m=${get_date[1]}; if test "${curr_m:0:1}" == "0"; then curr_m=${curr_m:1:1}; fi
@@ -109,6 +115,39 @@ function mkcal() {
 			cal_seq=(${cal_seq[*]} "__")
 		done
 	fi						# 前月分の日付をダミーデータで埋めて書式を整える。
+	declare -a h_day=()
+	declare -a w_day=()
+	IFS=':'
+	conf_str=(`printenv ${conf_dat[$curr_m]}`)
+	IFS=$OLD_IFS
+	if test ${#conf_str[*]} -ne 0; then			# 環境変数から該当年月の休日データを読み込む。
+		for i in ${conf_str[@]}; do
+			if test ${#i} -ne 0; then
+				for j in `seq 0 $((${#i} - 1))`; do
+					ltd_y=$curr_y
+					str_d=$i
+					case ${i:$j:1} in
+						+|-)	if test $j -ne 0; then
+									ltd_y=${i:0:$j}
+									str_d=${i:$j}
+								fi
+								break;;
+					esac
+				done
+			fi
+			if test $ltd_y -eq $curr_y; then
+				last_adr=$((${#str_d} - 1))
+				for i in `seq $last_adr 0`; do
+					case ${str_d:$i:1} in
+						+)	h_day+=(${str_d:$(($i + 1)):$(($last_adr - $i))})
+							last_adr=$(($i - 1));;
+						-)	w_day+=(${str_d:$(($i + 1)):$(($last_adr - $i))})
+							last_adr=$(($i - 1));;
+					esac
+				done
+			fi
+		done
+	fi
 	declare -a curr_cal=()
 	for i in `seq 1 ${EOM[$curr_m]}`; do
 		curr_cal[$i]=$i
@@ -118,13 +157,38 @@ function mkcal() {
 		if test $i -eq $curr_d -a "$diff_m" == "+0" -a "$diff_y" == "+0"; then
 			curr_cal[$i]="\033[47m"${curr_cal[$i]}"\033[0m"
 		fi					# 本スクリプトの心臓。本日日付をエスケープシーケンスでマーク。
-	done					# 配列の添字と日付を揃えることで判定処理を簡略化。
+		if test ${#h_day[*]} -ne 0; then
+			for j in ${h_day[@]}; do
+				if test $j -eq $i; then
+					curr_cal[$i]="\033[35m"${curr_cal[$i]}"\033[0m"
+				fi						# 休日色（マゼンタ）に設定。
+			done
+		fi
+		if test ${#w_day[*]} -ne 0; then
+			for j in ${w_day[@]}; do
+				if test $j -eq $i; then
+					curr_cal[$i]="\033[30m"${curr_cal[$i]}"\033[0m"
+				fi						# 平日色に設定。
+			done
+		fi
+	done								# 配列の添字と日付を揃えることで判定処理を簡略化。
 	cal_seq=(${cal_seq[*]} ${curr_cal[*]})
 	if test $((${#cal_seq[*]} % 7)) -ne 0; then
 		for i in `seq 6 $((${#cal_seq[*]} % 7))`; do
 			cal_seq=(${cal_seq[*]} "__")
 		done
-	fi						# 翌月分の日付をダミーデータで埋めて書式を整える。
+	fi									# 翌月分の日付をダミーデータで埋めて書式を整える。
+	declare -a h_week=()
+	IFS=','
+	h_week=(`printenv ${conf_dat[0]}`)	# 休曜日の設定。
+	IFS=$OLD_IFS
+	if test ${#h_week[*]} -ne 0; then
+		for i in ${h_week[*]}; do		# 指定週を休日色（マゼンタ）に変更。
+			for j in `seq 0 $((${#cal_seq[*]} / 7 - 1))`; do
+				cal_seq[$(($i + $j * 7))]="\033[35m"${cal_seq[$(($i + $j * 7))]}"\033[0m"
+			done
+		done
+	fi
 	while test ${#week} -lt $((20 - ${EOM[0]})); do
 		week="_"${week}"_"
 	done					# 月名ヘッダをセンタリング。
