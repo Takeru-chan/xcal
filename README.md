@@ -56,7 +56,7 @@ OSXにはない３ヶ月表示オプションを追加したついでに、通�
 ハッピーマンデーはmに続けて第何週かの数字を指定します。
 年ごとの日付指定は:で区切ります。  
 
-指定の日付が競合した場合、個別休日指定&gt;個別稼働日指定&gt;曜日別休日指定の順に優先されます。
+指定の日付が競合した場合、個別稼働日指定&gt;個別休日指定&gt;曜日別休日指定の順に優先されます。
 ##License
 This script has released under the MIT license.  
 [http://opensource.org/licenses/MIT](http://opensource.org/licenses/MIT)
