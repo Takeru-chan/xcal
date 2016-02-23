@@ -56,7 +56,7 @@ let testArguments: [(args:[String], raws:Int, cols:Int, weekFlag:Bool,
 for (var i = 0; i < testArguments.count; i++) {
     print("\(testArguments[i].args) ", terminator:"")
     var options = (raws:0, cols:0, weekFlag:false, year:0, month:0, adjust:0, error:Int32(0))
-    options = checkOption(arguments: testArguments[i].args).getCalendarFormat()
+    options = Option(arguments: testArguments[i].args).getCalendarFormat()
     if testArguments[i].raws == options.raws &&
        testArguments[i].cols == options.cols &&
        testArguments[i].weekFlag == options.weekFlag &&

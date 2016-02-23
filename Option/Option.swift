@@ -1,4 +1,4 @@
-class checkOption {
+class Option {
     private var arguments: [String]
     private var calendarRaws: Int   // 表示月行数
     private var calendarCols: Int   // 表示月列数
