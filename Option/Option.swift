@@ -21,7 +21,7 @@ class Option {
         self.adjustMonth = adjustMonth
         self.optionError = optionError
     }
-    func checkSwitch() {
+    func getCalendarFormat() -> (Int, Int, Bool, Int, Int, Int, Int32) {
         var checkString: (value: Int, status: Int32)
         if arguments.count > 4 {
             optionError = 9
@@ -85,6 +85,7 @@ class Option {
                 optionError = 9
             }
         }
+        return (calendarRaws, calendarCols, weekFormat, startYear, startMonth, adjustMonth, optionError)
     }
     func checkNaturalNumber(target: String, maxValue: Int, minValue: Int) -> (Int, Int32) {
         var value: Int = 0      // OKなら変換値、NGなら-1を返す
@@ -108,9 +109,5 @@ class Option {
             }
         }
         return (value, status)
-    }
-    func getCalendarFormat() -> (Int, Int, Bool, Int, Int, Int, Int32) {
-        self.checkSwitch()
-        return (calendarRaws, calendarCols, weekFormat, startYear, startMonth, adjustMonth, optionError)
     }
 }
