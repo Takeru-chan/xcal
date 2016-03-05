@@ -100,15 +100,13 @@ class DateSequence {
                         // 曜日/日付=64/0
         self.makeDateSet(targetYear, targetMonth: 1, targetWeek: targetWeek)
         var weeklySequence: [(day: Int, status: Int)] = Array(count:14, repeatedValue:(0, 0))
-        for (var i = 0; i < 7; i++) {
-            weeklySequence[i] = (day: i - 7, status: 64)
-        }
         var dateIndex: Int = targetDateSet.day - targetDateSet.weekday + 1
         var previousMonthDate: Int = endOfMonth[targetDateSet.month - 1]
         if previousMonthDate == 0 {
             previousMonthDate = 31
         }
         for (var i = 0; i < 7; i++) {
+            weeklySequence[i] = (day: i - 7, status: 64)
             weeklySequence[i + 7].day = dateIndex
             if dateIndex < 1 {
                 weeklySequence[i + 7].day += previousMonthDate
