@@ -1,5 +1,5 @@
 #! /bin/bash
-# @(#) xcal.sh ver.1.3.2  2015.1.25  (c)Takeru.
+# @(#) xcal.sh ver.1.3.3  2016.3.14  (c)Takeru.
 #
 # Usage:
 #      xcal.sh [-m month [year]]
@@ -21,6 +21,7 @@
 #
 #######################################################################
 set -o nounset                              # Treat unset variables as an error
+if [ $(uname) = "Darwin" -o $(uname) = "FreeBSD" ] ; then
 OLD_IFS=$IFS
 declare -a conf_ext=("WEEK" "JAN" "FEB" "MAR" "APR" "MAY" "JUN" "JUL" "AUG" "SEP" "OCT" "NOV" "DEC")
 declare -a conf_dat=()
@@ -102,7 +103,7 @@ function mkcal() {
     fi                                      # 閏年判定をして月末数列を書き換え。
     week=$curr_B                            # デフォルトは英語環境。
     declare -a cal_seq=(Su Mo Tu We Th Fr Sa)
-	lang_str=`printenv LANG`
+    lang_str=`printenv LANG`
     if test "$lang_str" == "ja_JP.UTF-8"; then
         EOM[0]=1                            # 日本語環境フラグをON。
         week=$curr_m"月"
@@ -242,3 +243,6 @@ for l in `seq 1 ${loops:1:1}`; do           # 年表示用ループ。
         printf "${lines[$i]}\n" | sed -e 's/_/ /g' -e 's/ *$//'
     done                                    # 月データをフィルタリング後に表示。
 done
+else
+    echo "Cannot work on $(uname)."
+fi
